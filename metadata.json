@@ -1,0 +1,5 @@
+{
+  "name": "Colton Archive Sentinel",
+  "description": "A RAG-based knowledge management system for personal branding and professional data retrieval using Gemini 2.5.",
+  "requestFramePermissions": []
+}
