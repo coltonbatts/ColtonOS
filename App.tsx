@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ViewMode, MarkdownFile, Message, ChatState } from './types';
 import { INITIAL_KNOWLEDGE_BASE } from './constants';
-import { initializeChat, sendMessageToGemini } from './services/geminiService';
+import { initializeChat, sendMessageToGemini, sendToolResponse } from './services/geminiService';
 import Sidebar from './components/Sidebar';
 import ChatMessage from './components/ChatMessage';
 import ReactMarkdown from 'react-markdown';
-import { ArrowRight, FileText, Edit2, Save, Trash2, X, Terminal, Sparkles } from 'lucide-react';
+import { ArrowRight, FileText, Edit2, Save, Trash2, X, Terminal, Sparkles, CheckCircle2 } from 'lucide-react';
 
 const STORAGE_KEY = 'colton-archive-kb-v2';
 
@@ -78,19 +78,66 @@ const App: React.FC = () => {
     setInput('');
 
     try {
+      // 1. Send message to AI
       const response = await sendMessageToGemini(userMsg.content);
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: Date.now()
-      };
 
-      setChatState(prev => ({
-        ...prev,
-        messages: [...prev.messages, aiMsg],
-        isLoading: false
-      }));
+      // 2. Check if AI wants to call a function
+      if (response.toolCall) {
+        const { name, args, id } = response.toolCall;
+
+        if (name === 'create_file') {
+          // Execute the tool: Create the file in React State
+          const newFile: MarkdownFile = {
+            path: args.path,
+            category: args.category,
+            content: args.content,
+            lastUpdated: new Date().toISOString().split('T')[0]
+          };
+
+          // Update Knowledge Base
+          setKnowledgeBase(prev => [...prev, newFile]);
+
+          // Add a minimal "System" message to chat showing the action
+          const systemActionMsg: Message = {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: `*System Action: Created file ${newFile.path}*`,
+            timestamp: Date.now()
+          };
+          setChatState(prev => ({...prev, messages: [...prev.messages, systemActionMsg]}));
+
+          // 3. Send success back to AI to get final confirmation
+          const toolConfirm = await sendToolResponse(id, name, { status: 'success', path: newFile.path });
+          
+          const aiMsg: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: toolConfirm.text || "File created successfully.",
+            timestamp: Date.now()
+          };
+
+          setChatState(prev => ({
+            ...prev,
+            messages: [...prev.messages, aiMsg],
+            isLoading: false
+          }));
+        }
+      } else {
+        // Standard Text Response
+        const aiMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response.text || "I processed that.",
+          timestamp: Date.now()
+        };
+
+        setChatState(prev => ({
+          ...prev,
+          messages: [...prev.messages, aiMsg],
+          isLoading: false
+        }));
+      }
+
     } catch (error) {
        setChatState(prev => ({
         ...prev,
@@ -196,9 +243,9 @@ const App: React.FC = () => {
                     <span className="block text-xs font-mono text-gray-400 mb-1 uppercase">Bio Query</span>
                     <span className="text-sm font-medium text-gray-900 group-hover:text-black">"What is Colton's current focus?"</span>
                  </button>
-                 <button onClick={() => handleSendMessage("Draft a tweet about my new project.")} className="text-left p-4 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-all group">
-                    <span className="block text-xs font-mono text-gray-400 mb-1 uppercase">Generation</span>
-                    <span className="text-sm font-medium text-gray-900 group-hover:text-black">"Draft a tweet about my project."</span>
+                 <button onClick={() => handleSendMessage("Create a new file for project 'Apex' with a basic outline.")} className="text-left p-4 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-all group">
+                    <span className="block text-xs font-mono text-gray-400 mb-1 uppercase">Agentic Action</span>
+                    <span className="text-sm font-medium text-gray-900 group-hover:text-black">"Create a new file for project 'Apex'..."</span>
                  </button>
                  <button onClick={() => handleSendMessage("List all active projects.")} className="text-left p-4 border border-gray-200 rounded-lg hover:border-black hover:bg-gray-50 transition-all group">
                     <span className="block text-xs font-mono text-gray-400 mb-1 uppercase">Retrieval</span>
@@ -239,7 +286,7 @@ const App: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Query the archive..."
+              placeholder="Query the archive or ask to create a file..."
               className="w-full bg-white border border-gray-200 rounded-xl p-4 pr-14 text-gray-900 focus:outline-none focus:border-black focus:ring-1 focus:ring-black font-sans text-base resize-none h-14 shadow-sm transition-all placeholder:text-gray-400"
             />
             <button

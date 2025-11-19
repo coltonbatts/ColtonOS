@@ -1,5 +1,5 @@
-import { GoogleGenAI, ChatSession } from "@google/genai";
-import { MarkdownFile, Message } from '../types';
+import { GoogleGenAI, ChatSession, Type, FunctionDeclaration } from "@google/genai";
+import { MarkdownFile } from '../types';
 import { SYSTEM_INSTRUCTION_HEADER } from '../constants';
 
 // Store the session instance
@@ -17,6 +17,30 @@ ${f.content}
 `).join('\n');
 };
 
+// Define the Tool
+const createFileTool: FunctionDeclaration = {
+  name: 'create_file',
+  description: 'Create a new markdown file in the archive. Use this when the user asks to save a draft, create a project, or store information.',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      path: {
+        type: Type.STRING,
+        description: 'The full file path, starting with /. Example: /Projects/Under_Armour.md or /Bio/My_Story.md',
+      },
+      category: {
+        type: Type.STRING,
+        description: 'The folder category. Example: Projects, Bio, Brand, Notes',
+      },
+      content: {
+        type: Type.STRING,
+        description: 'The full Markdown content of the file.',
+      },
+    },
+    required: ['path', 'category', 'content'],
+  },
+};
+
 export const initializeChat = async (files: MarkdownFile[]) => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
@@ -30,35 +54,79 @@ export const initializeChat = async (files: MarkdownFile[]) => {
 ${SYSTEM_INSTRUCTION_HEADER}
 
 ### THE KNOWLEDGE BASE (CURRENT ARCHIVE)
-The following text is the ENTIRETY of what you know. You do not know anything outside of this.
-If a user asks about Colton, you MUST look here first.
-
+The following text is the ENTIRETY of what you know.
 ${formatKnowledgeBase(files)}
+
+### TOOLS
+You have access to a "create_file" tool.
+- If the user asks you to "draft", "create", "write", or "save" a document, use this tool immediately.
+- Do not ask for permission to use it. Just do it.
 `;
 
   chatSession = ai.chats.create({
     model: 'gemini-2.5-flash',
     config: {
       systemInstruction: fullSystemInstruction,
-      temperature: 0.5, // Lowered temperature to stick closer to the provided text
+      temperature: 0.5,
+      tools: [{ functionDeclarations: [createFileTool] }],
     },
   });
 };
 
-export const sendMessageToGemini = async (userMessage: string): Promise<string> => {
-  if (!chatSession) {
-    // If session is missing, we might need to wait or throw. 
-    // Ideally App.tsx handles initialization, but a safety check:
-    throw new Error("Chat session not initialized");
-  }
+// Define a response type that can be Text OR a Function Call
+export interface GeminiResponse {
+  text?: string;
+  toolCall?: {
+    id: string;
+    name: string;
+    args: any;
+  };
+}
+
+export const sendMessageToGemini = async (userMessage: string): Promise<GeminiResponse> => {
+  if (!chatSession) throw new Error("Chat session not initialized");
 
   try {
-    const result = await chatSession.sendMessage({
-        message: userMessage
-    });
-    return result.text || "I processed the request but received no textual output.";
+    const result = await chatSession.sendMessage({ message: userMessage });
+    
+    // Check for function calls
+    const toolCalls = result.functionCalls;
+    if (toolCalls && toolCalls.length > 0) {
+      const call = toolCalls[0];
+      return {
+        toolCall: {
+          id: call.id,
+          name: call.name,
+          args: call.args
+        }
+      };
+    }
+
+    return { text: result.text || "No output." };
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "CRITICAL ERROR: Connection to Intelligence Layer failed. Please check your network or API Key.";
+    return { text: "Error communicating with Archive Intelligence." };
+  }
+};
+
+export const sendToolResponse = async (toolCallId: string, functionName: string, result: any): Promise<GeminiResponse> => {
+  if (!chatSession) throw new Error("Chat session not initialized");
+
+  try {
+    // Send the execution result back to the model so it can confirm to the user
+    const response = await chatSession.sendToolResponse({
+      functionResponses: [
+        {
+          id: toolCallId,
+          name: functionName,
+          response: { result: result },
+        }
+      ]
+    });
+
+    return { text: response.text || "Action confirmed." };
+  } catch (error) {
+    console.error("Tool Response Error:", error);
+    return { text: "Error confirming action." };
   }
 };
