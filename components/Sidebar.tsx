@@ -1,6 +1,6 @@
 import React from 'react';
 import { MarkdownFile, ViewMode } from '../types';
-import { Folder, FileText, MessageSquare, Database, Box, Command } from 'lucide-react';
+import { Folder, FileText, Database, Box, Command, Plus } from 'lucide-react';
 
 interface SidebarProps {
   files: MarkdownFile[];
@@ -8,6 +8,7 @@ interface SidebarProps {
   onModeChange: (mode: ViewMode) => void;
   onFileSelect: (file: MarkdownFile) => void;
   selectedFile: MarkdownFile | null;
+  onCreateFile: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -15,7 +16,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   currentMode, 
   onModeChange, 
   onFileSelect,
-  selectedFile
+  selectedFile,
+  onCreateFile
 }) => {
   
   // Group files by category
@@ -34,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <span className="font-bold tracking-tight font-mono text-base">ARCHIVE</span>
         </div>
         <div className="text-[10px] text-gray-400 font-mono uppercase tracking-widest">
-          Colton Batts // v3.0
+          Colton Batts // v3.1
         </div>
       </div>
 
@@ -66,8 +68,17 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Archive Explorer */}
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="text-[10px] font-mono text-gray-400 mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">
-          File System
+        <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-2">
+             <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+              File System
+            </div>
+            <button 
+                onClick={onCreateFile}
+                className="text-black hover:bg-gray-100 p-1 rounded-sm transition-colors"
+                title="New Entry"
+            >
+                <Plus size={14} />
+            </button>
         </div>
         
         <div className="space-y-6">
@@ -104,8 +115,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Footer */}
       <div className="p-4 border-t border-gray-100 bg-gray-50/50">
         <div className="flex items-center gap-2 text-gray-400 text-[10px] font-mono">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            <span>CONNECTED</span>
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span>SYNC: LOCAL_STORAGE</span>
         </div>
       </div>
     </div>

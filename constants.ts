@@ -3,70 +3,71 @@ import { MarkdownFile } from './types';
 // This acts as the "Database" for the Archive
 export const INITIAL_KNOWLEDGE_BASE: MarkdownFile[] = [
   {
-    path: "/Brand/Voice_Guidelines.md",
-    category: "Brand",
-    lastUpdated: "2024-10-01",
-    content: `# Brand Voice Guidelines [DRAFT]
-
-## Core Principles
-1. **Clarity Over Cleverness:** We prioritize understanding.
-2. **Technical Precision:** Use correct terminology. Do not oversimplify engineering concepts.
-3. **Minimalist Professionalism:** Tone is objective, efficient, and helpful.
-
-## Formatting Standards
-- Headers are functional.
-- Lists are preferred for data.
-- Code snippets must include language tags.
-`
-  },
-  {
-    path: "/Bio/Profile.md",
+    path: "/Bio/Main_Bio.md",
     category: "Bio",
-    lastUpdated: "2024-10-01",
-    content: `# Professional Profile [TEMPLATE]
+    lastUpdated: "2024-05-22",
+    content: `# Main Bio
 
-## Summary
-[Insert 2-3 sentences about your current focus, e.g., Full Stack Engineer specializing in AI integration...]
+Colton Batts is a filmmaker and designer based in Fort Worth, Texas, specializing in video editing, motion graphics, and creative-tech workflows. After years working in corporate design, he shifted into freelance work under Alternative Design LLC, where he helps brands and studios produce clean, effective visuals and streamlined content systems.
 
-## Core Competencies
-- **Frontend:** React ecosystem, UI/UX Systems
-- **Backend:** Scalable Node.js/Go architectures
-- **Strategy:** Product Lifecycle Management
-`
+His focus is on delivering work that makes clients look good fast — balancing craft and speed with modern production tools, including AI-assisted editing and automation where it helps. Recent work includes post-production and motion design across commercial, corporate, and social campaigns, with clients such as Under Armour and Google.
+
+Colton’s strengths include editing, motion design, branding, and building systems that reduce production bottlenecks. He cares about clarity, creativity, and helping teams move from messy first drafts to polished final delivery without drama.
+
+He is currently taking on new freelance work in post-production, content creation, and design.`
   },
   {
-    path: "/Projects/Current_Work.md",
-    category: "Projects",
-    lastUpdated: "2024-10-05",
-    content: `# Active Projects
+    path: "/Brand/Positioning.md",
+    category: "Brand",
+    lastUpdated: "2024-05-22",
+    content: `# Positioning
 
-## Project A: [Name]
-**Status:** In Development
-**Tech Stack:** Next.js, Gemini API, Tailwind
-**Notes:**
-- Currently refining the integration layer.
-- Needs performance audit on the vector search.
+## Who I Help
+Mid-sized brands, creative studios, and independent founders who need high-quality video content delivered quickly and consistently.
 
-## Project B: [Name]
-**Status:** Concept Phase
-**Notes:**
-- Researching feasibility of edge computing solution.
-`
+## The Core Value
+I bridge creative vision and execution: fast turnaround, strong taste, modern workflows.
+
+## What Makes This Different
+- Experience in both corporate and independent creative environments
+- Systems-driven approach that reduces friction and revision cycles
+- Ability to integrate AI tools without compromising quality or craft
+- Hands-on production mindset: I edit, design, animate, and solve problems
+
+## The Promise
+Clear communication. Clean visuals. On-time delivery.
+
+## Results
+Projects that feel polished, consistent, and aligned with the brand — without the typical chaos of production.`
   },
   {
-    path: "/Philosophy/Engineering.md",
-    category: "Philosophy",
-    lastUpdated: "2023-11-10",
-    content: `# Engineering Philosophy
+    path: "/Bio/Skills_Stack.md",
+    category: "Bio",
+    lastUpdated: "2024-05-22",
+    content: `# Skills Stack
 
-## Simplicity
-"Complexity is the enemy of reliability."
+## Core Strengths
+- Video editing (Premiere Pro, DaVinci Resolve)
+- Motion graphics and title design (After Effects)
+- Brand and content design (Photoshop, Illustrator)
+- Story structure, pacing, and editorial clarity
+- Thumbnail and social asset design for high engagement
 
-## User Centricity
-- Speed is a feature.
-- Accessibility is a requirement, not an add-on.
-- Aesthetic minimalism reduces cognitive load.
-`
+## Workflow & Technology
+- AI-assisted post-production and automation
+- LLM-powered creative workflows (Gemini, Claude, ChatGPT)
+- Asset organization and versioning systems
+- Cloud collaboration for remote teams
+
+## Additional Capabilities
+- Light 3D integration for motion design
+- Sound design support for small teams
+- Content strategy input where helpful
+
+## Current Focus Areas
+- Faster iterative editing for high-volume social content
+- Developing modular brand systems for repeat campaigns
+- Helping clients adopt efficient creative-tech workflows`
   }
 ];
 
@@ -75,12 +76,12 @@ export const SYSTEM_INSTRUCTION_HEADER = `
 You are the "Colton Archive," a digital knowledge assistant for Colton Batts. Your purpose is to retrieve and manage professional data. You are efficient, precise, and professional.
 
 ### CORE BEHAVIORS
-1. **Brand Guardian:** Adhere to the professional tone found in /Brand/Voice_Guidelines.md.
-2. **Source Citation:** When providing facts, reference the source file (e.g., [Ref: /Bio/Profile.md]).
-3. **Gap Analysis:** If information is missing from the knowledge base, simply state: "Data not found in current archive."
-4. **Content Generation:** If asked to draft content, stick to the minimal, high-contrast aesthetic described in the design ethos.
+1. **Brand Guardian:** Adhere to the professional tone found in /Brand/Positioning.md.
+2. **Source Citation:** When providing facts, reference the source file (e.g., [Ref: /Bio/Main_Bio.md]).
+3. **Constructive Gaps:** If asked about a topic not in the database, state clearly that the record is missing, but suggest *where* it should be added.
+4. **Formatting:** Use Markdown. Bold key terms.
 
-### STYLE
-- **Professional & Direct**
-- **No Roleplay:** Do not use phrases like "Sentinel Online" or "System Failure". Speak naturally but concisely.
+### PERSONALITY
+- You are NOT a robot. You are an extension of Colton's professional intent.
+- Be concise.
 `;
