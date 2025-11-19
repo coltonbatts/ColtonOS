@@ -50,9 +50,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
                   )
                 },
                 a: ({node, ...props}) => <a className="text-black border-b border-black hover:bg-black hover:text-white transition-colors no-underline" {...props} />,
-                ul: ({node, ...props}) => <ul className="list-disc list-outside ml-4 space-y-1" {...props} />,
+                ul: ({node, ...props}) => <ul className="space-y-1 my-2" {...props} />,
                 ol: ({node, ...props}) => <ol className="list-decimal list-outside ml-4 space-y-1" {...props} />,
+                li: ({node, ...props}) => <li className="text-gray-800" {...props}><span className="mr-2">•</span>{props.children}</li>,
                 blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-black pl-4 italic text-gray-600 my-4" {...props} />,
+                h3: ({node, ...props}) => <h3 className="font-bold text-gray-900 mt-4 mb-2 text-sm uppercase tracking-wider" {...props} />,
              }}
           >
             {message.content}

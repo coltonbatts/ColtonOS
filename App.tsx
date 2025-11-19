@@ -184,7 +184,7 @@ const App: React.FC = () => {
                 <Terminal size={32} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight text-black mb-2">Colton Archive v3.1</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-black mb-2">Colton_OS v3.1</h1>
                 <p className="text-gray-500 max-w-md mx-auto">
                   Knowledge Base Active. {knowledgeBase.length} files indexed. 
                   <br/>Ready for retrieval or content generation.
@@ -345,7 +345,35 @@ const App: React.FC = () => {
                 <div className="h-full overflow-y-auto p-12 bg-gray-50">
                     <div className="max-w-3xl mx-auto bg-white p-12 border border-gray-200 shadow-sm min-h-[800px]">
                         <ReactMarkdown
-                        className="prose prose-sm max-w-none font-sans prose-headings:font-bold prose-headings:font-sans prose-h1:text-3xl prose-h1:tracking-tight prose-h1:text-black prose-h2:text-lg prose-h2:uppercase prose-h2:tracking-widest prose-h2:border-b prose-h2:border-black prose-h2:pb-2 prose-h2:mt-8 prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-black"
+                            className="prose prose-sm max-w-none font-sans"
+                            components={{
+                                h1: ({node, ...props}) => <h1 className="text-4xl font-bold tracking-tight text-black mb-8 pb-6 border-b border-gray-100" {...props} />,
+                                h2: ({node, ...props}) => <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mt-12 mb-6 border-b border-gray-100 pb-2" {...props} />,
+                                h3: ({node, ...props}) => <h3 className="text-lg font-bold text-black mt-8 mb-3" {...props} />,
+                                p: ({node, ...props}) => <p className="text-gray-700 leading-7 mb-5 text-[15px]" {...props} />,
+                                ul: ({node, ...props}) => <ul className="space-y-2 mb-6 ml-2" {...props} />,
+                                ol: ({node, ...props}) => <ol className="list-decimal ml-6 space-y-2 mb-6 text-gray-700" {...props} />,
+                                li: ({node, ...props}) => (
+                                    <li className="flex gap-3 items-start text-gray-700 leading-7 text-[15px]" {...props}>
+                                        {/* Custom bullet to look more tech/clean than standard disc */}
+                                        <span className="mt-2.5 w-1 h-1 bg-black shrink-0" /> 
+                                        <span>{props.children}</span>
+                                    </li>
+                                ),
+                                strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                                blockquote: ({node, ...props}) => <blockquote className="border-l-2 border-black pl-6 italic text-gray-600 my-8" {...props} />,
+                                code: ({node, inline, className, children, ...props}: any) => {
+                                    return inline ? (
+                                        <code className="bg-gray-100 text-gray-900 px-1.5 py-0.5 rounded-sm font-mono text-xs" {...props}>
+                                            {children}
+                                        </code>
+                                    ) : (
+                                        <div className="bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto my-6 font-mono text-xs leading-relaxed">
+                                            {children}
+                                        </div>
+                                    );
+                                }
+                            }}
                         >
                             {file.content}
                         </ReactMarkdown>

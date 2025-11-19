@@ -33,7 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-center gap-2 text-black mb-1">
           <Box size={18} strokeWidth={2.5} />
-          <span className="font-bold tracking-tight font-mono text-base">ARCHIVE</span>
+          <span className="font-bold tracking-tight font-mono text-base">COLTON_OS</span>
         </div>
         <div className="text-[10px] text-gray-400 font-mono uppercase tracking-widest">
           Colton Batts // v3.1
